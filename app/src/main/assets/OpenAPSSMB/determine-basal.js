@@ -334,8 +334,12 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
     var dynISFadjust = profile.dynisfadjust
     var variable_sens = (277700 / ((dynISFadjust * TDD) * bg));
     variable_sens = round(variable_sens,1);
-    console.log("Current sensitivity for predictions is " +variable_sens+" based on current bg");
-
+    if (dynISFadjust > 1 || dynISFadjust < 1) {
+        console.log("TDD adjustment factor is: " +dynISFadjust+"; ");
+        console.log("Current sensitivity for predictions is " +variable_sens+" based on current bg");
+    } else {
+        console.log("Current sensitivity for predictions is " +variable_sens+" based on current bg");
+    }
     sens = variable_sens;
 
     //*********************************************************************************
