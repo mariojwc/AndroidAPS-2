@@ -331,8 +331,8 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
              rT.reason += "TDD: " +TDD+ " based on standard pump 60/tdd7 40 split; ";
              }
 
-
-    var variable_sens = (277700 / (TDD * bg));
+    var dynISFadjust = profile.dynisfadjust
+    var variable_sens = (277700 / ((dynISFadjust * TDD) * bg));
     variable_sens = round(variable_sens,1);
     console.log("Current sensitivity for predictions is " +variable_sens+" based on current bg");
 
