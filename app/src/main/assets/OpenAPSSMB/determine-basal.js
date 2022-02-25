@@ -331,7 +331,7 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
              rT.reason += "TDD: " +TDD+ " based on standard pump 60/tdd7 40 split; ";
              }
 
-    var dynISFadjust = profile.dynisfadjust
+    var dynISFadjust = profile.dynisfadjust;
     var variable_sens = (277700 / ((dynISFadjust * TDD) * bg));
     variable_sens = round(variable_sens,1);
     if (dynISFadjust > 1 || dynISFadjust < 1) {
