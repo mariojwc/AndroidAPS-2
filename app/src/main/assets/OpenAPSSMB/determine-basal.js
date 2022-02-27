@@ -217,7 +217,7 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
         sensitivityRatio = autosens_data.ratio;
         console.log("Autosens ratio: "+sensitivityRatio+"; ");
     }
-    if (sensitivityRatio) {
+    /*if (sensitivityRatio) {
         basal = profile.current_basal * sensitivityRatio;
         basal = round_basal(basal, profile);
         if (basal !== profile_current_basal) {
@@ -225,7 +225,7 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
         } else {
             console.log("Basal unchanged: "+basal+"; ");
         }
-    }
+    }*/
 
     // adjust min, max, and target BG for sensitivity, such that 50% increase in ISF raises target from 100 to 120
     if (profile.temptargetSet) {
@@ -301,8 +301,22 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
     }
     console.error("7-day average TDD is: " +tdd7+ "; ");
 
-        var tdd_pump_now = meal_data.TDDPUMP;
-        var tdd_pump = ( tdd_pump_now / (now / 24));
+    if (meal_data.TDDLast24){
+            var tdd_24 = meal_data.TDDLast24;
+            }
+            else {
+            var tdd_24 = (( basal * 24 ) * 2.8);
+            }
+
+       if (meal_data.TDDPUMP){
+            var tdd_pump = ( (meal_data.TDDPUMP / now ) * 24);
+            }
+            else {
+            var tdd_pump = (( basal * 24 ) * 2.8);
+            }
+
+        /*var tdd_pump_now = meal_data.TDDPUMP;
+        var tdd_pump = ( tdd_pump_now / (now / 24));*/
         var TDD = (tdd7 * 0.4) + (tdd_pump * 0.6);
 
        console.error("Pump extrapolated TDD = "+tdd_pump+"; ");
@@ -334,7 +348,11 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
     var dynISFadjust = profile.dynisfadjust;
     var variable_sens = (277700 / ((dynISFadjust * TDD) * bg));
     variable_sens = round(variable_sens,1);
-    if (dynISFadjust > 1 || dynISFadjust < 1) {
+    if (dynISFadjust > 1 ) {
+        console.log("TDD adjustment factor is: " +dynISFadjust+"; ");
+        console.log("Current sensitivity for predictions is " +variable_sens+" based on current bg");
+    }
+    else if (dynISFadjust < 1 ){
         console.log("TDD adjustment factor is: " +dynISFadjust+"; ");
         console.log("Current sensitivity for predictions is " +variable_sens+" based on current bg");
     } else {
@@ -351,10 +369,33 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
         sens =  sens / sensitivityRatio ;
         sens = round(sens, 1);
         console.log("ISF from "+variable_sens+" to "+sens+ "due to temp target; ");
-    } else {
-        sens = sens;
+    }       else {
+             sensitivityRatio = ( ( ( tdd_24 * 0.5 ) + (tdd_pump * 0.5) ) / tdd7 );
+                 if (sensitivityRatio > 1) {
+                 sensitivityRatio = Math.min(sensitivityRatio, profile.autosens_max);
+                 sensitivityRatio = round(sensitivityRatio,2);
+                 console.log("Sensitivity ratio: "+sensitivityRatio+"; ");
+             }
+                 else if( sensitivityRatio < 1) {
+                 sensitivityRatio = Math.max(sensitivityRatio, profile.autosens_min);
+                 sensitivityRatio = round(sensitivityRatio,2);
+                 console.log("Sensitivity ratio: "+sensitivityRatio+"; ");
+                     }
+             }
+
+
+         if (sensitivityRatio) {
+             basal = profile.current_basal * sensitivityRatio;
+             basal = round_basal(basal, profile);
+             if (basal !== profile_current_basal) {
+                 console.log("Adjusting basal from "+profile_current_basal+" to "+basal+"; ");
+             } else {
+                 console.log("Basal unchanged: "+basal+"; ");
+             }
+         }
+        /*sens = sens;
         sens = round(sens, 1);
-    }
+    }*/
 
     console.error("; CR:",profile.carb_ratio);
 
