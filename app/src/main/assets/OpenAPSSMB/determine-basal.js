@@ -294,22 +294,7 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
     //*********************************************************************************
 
 
-    if ( high_temptarget_raises_sensitivity && profile.temptargetSet && target_bg > normalTarget || profile.low_temptarget_lowers_sensitivity && profile.temptargetSet && target_bg < normalTarget ) {
-        // w/ target 100, temp target 110 = .89, 120 = 0.8, 140 = 0.67, 160 = .57, and 200 = .44
-        // e.g.: Sensitivity ratio set to 0.8 based on temp target of 120; Adjusting basal from 1.65 to 1.35; ISF from 58.9 to 73.6
-        //sensitivityRatio = 2/(2+(target_bg-normalTarget)/40);
-        var c = halfBasalTarget - normalTarget;
-        sensitivityRatio = c/(c+target_bg-normalTarget);
-        // limit sensitivityRatio to profile.autosens_max (1.2x by default)
-        sensitivityRatio = Math.min(sensitivityRatio, profile.autosens_max);
-        sensitivityRatio = round(sensitivityRatio,2);
-        console.log("Sensitivity ratio set to "+sensitivityRatio+" based on temp target of "+target_bg+"; ");
-        sens =  sens / sensitivityRatio ;
-        sens = round(sens, 1);
-        console.log("ISF from "+variable_sens+" to "+sens+ "due to temp target; ");
-        }
-        else {
-        sensitivityRatio = ( ( ( tdd_24 * 0.5 ) + (tdd_pump * 0.5) ) / tdd7 );
+    sensitivityRatio = ( ( ( tdd_24 * 0.5 ) + (tdd_pump * 0.5) ) / tdd7 );
             if (sensitivityRatio > 1) {
             sensitivityRatio = Math.min(sensitivityRatio, profile.autosens_max);
             sensitivityRatio = round(sensitivityRatio,2);
@@ -320,16 +305,15 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
             sensitivityRatio = round(sensitivityRatio,2);
             console.log("Sensitivity ratio: "+sensitivityRatio+"; ");
                 }
-        }
 
 
-    if (sensitivityRatio) {
+    if (sensitivityRatio && profile.openapsama_useautosens === true) {
         basal = profile.current_basal * sensitivityRatio;
         basal = round_basal(basal, profile);
         if (basal !== profile_current_basal) {
             console.log("Adjusting basal from "+profile_current_basal+" to "+basal+"; ");
         } else {
-            console.log("Basal unchanged: "+basal+"; ");
+            console.log("Autosens disabled. Basal unchanged: "+basal+"; ");
         }
     }
 
