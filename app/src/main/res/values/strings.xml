@@ -925,7 +925,7 @@
 
     <string name="key_DynISFAdjust" translatable="false">DynISFAdjust</string>
     <string name="DynISFAdjust_title">DynamicISF Adjustment Factor %</string>
-    <string name="DynISFAdjust_summary">percentage of the algos determined insulin to give</string>
+    <string name="DynISFAdjust_summary">Adjustment factor for DynamicISF. Set more than 100% for more aggressive correction doses, and less than 100% for less aggressive corrections.</string>
 
 
     <string name="increasingmaxbasal">Increasing max basal value because setting is lower than your max basal in profile</string>
