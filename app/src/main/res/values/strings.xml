@@ -599,9 +599,7 @@
     <string name="key_smbinterval" translatable="false">smbinterval</string>
     <string name="smbinterval_summary">How frequently SMBs will be given in min</string>
     <string name="smbmaxminutes_summary">Max minutes of basal to limit SMB to</string>
-    <string name="dynisfadjust_summary">Adjustment factor for using Dynamic ISF to allow the value to be increased or decreased by the user. The default value of 1 is suitable for most users. Set below 1 for more aggressive correction doses, and greater than 1 for less aggressive corrections.</string>
     <string name="uamsmbmaxminutes">UAM SMB max minutes</string>
-    <string name="dynisfadjust">Dynamic ISF Adjustment Factor</string>
     <string name="uamsmbmaxminutes_summary">Max minutes of basal to limit SMB to for UAM</string>
     <string name="key_carbsReqThreshold" translatable="false">carbsReqThreshold</string>
     <string name="carbsReqThreshold">Minimum Carbs Required For Suggestion</string>
@@ -894,7 +892,6 @@
     <string name="tidepool_upload_bg">Upload BG tests</string>
 
     <string name="key_smbmaxminutes" translatable="false">smbmaxminutes</string>
-    <string name="key_dynisfadjust" translatable="false">dynisfadjust</string>
     <string name="key_uamsmbmaxminutes" translatable="false">uamsmbmaxminutes</string>
     <string name="dst_plugin_name" translatable="false">Daylight Saving time</string>
     <string name="dst_in_24h_warning">Daylight Saving time change in 24h or less</string>
@@ -925,6 +922,11 @@
     <string name="partialboluswizard">Deliver this part of bolus wizard result [%]</string>
     <string name="deliverpartofboluswizard">Bolus wizard performs calculation but only this part of calculated insulin is delivered. Useful with SMB algorithm.</string>
     <string name="snooze">Snooze</string>
+
+    <string name="key_DynISFAdjust" translatable="false">DynISFAdjust</string>
+    <string name="DynISFAdjust_title">DynamicISF Adjustment Factor %</string>
+    <string name="DynISFAdjust_summary">percentage of the algos determined insulin to give</string>
+
 
     <string name="increasingmaxbasal">Increasing max basal value because setting is lower than your max basal in profile</string>
     <string name="smscommunicator_messagebody">Invalid message body</string>
