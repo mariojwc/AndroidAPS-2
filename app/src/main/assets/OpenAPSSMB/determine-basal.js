@@ -347,7 +347,8 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
 
     var dynISFadjust = profile.DynISFAdjust;
     var dynISFadjust = ( dynISFadjust / 100 );
-    var variable_sens = (277700 / ((dynISFadjust * TDD) * bg));
+    var TDD = (dynISFadjust * TDD);
+    var variable_sens = (277700 / ( TDD * bg));
     variable_sens = round(variable_sens,1);
     if (dynISFadjust > 1 ) {
         console.log("TDD adjustment factor is: " +dynISFadjust+"; ");
