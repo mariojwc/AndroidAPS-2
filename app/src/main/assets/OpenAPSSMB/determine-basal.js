@@ -346,6 +346,7 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
              }
 
     var dynISFadjust = profile.DynISFAdjust;
+    var dynISFadjust = ( dynISFadjust / 100 );
     var variable_sens = (277700 / ((dynISFadjust * TDD) * bg));
     variable_sens = round(variable_sens,1);
     if (dynISFadjust > 1 ) {
