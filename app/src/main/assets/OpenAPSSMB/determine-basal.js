@@ -295,7 +295,7 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
 
 
     sensitivityRatio = ( ( tdd_24 * 0.5 ) + (tdd_pump * 0.5) ) / tdd7;
-        console.log("Sensitivity ratio: "+sensitivityRatio+"; ");
+
             if (sensitivityRatio > 1) {
             sensitivityRatio = Math.min(sensitivityRatio, profile.autosens_max);
             sensitivityRatio = round(sensitivityRatio,2);
