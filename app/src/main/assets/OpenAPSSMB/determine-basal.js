@@ -314,6 +314,7 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
             else {
             var tdd_pump = (( basal * 24 ) * 2.8);
             }
+       console.log("Rolling TDD for last 24 hours is: "tdd_24"; ");
 
         /*var tdd_pump_now = meal_data.TDDPUMP;
         var tdd_pump = ( tdd_pump_now / (now / 24));*/
@@ -373,8 +374,8 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
         sens =  sens / sensitivityRatio ;
         sens = round(sens, 1);
         console.log("ISF from "+variable_sens+" to "+sens+ "due to temp target; ");
-    }       else {
-             sensitivityRatio = ( ( ( tdd_24 * 0.5 ) + (tdd_pump * 0.5) ) / tdd7 );
+    } else {
+             sensitivityRatio = ( TDD / tdd7 );
                  if (sensitivityRatio > 1) {
                  sensitivityRatio = Math.min(sensitivityRatio, profile.autosens_max);
                  sensitivityRatio = round(sensitivityRatio,2);
@@ -388,7 +389,7 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
              }
 
 
-         if (sensitivityRatio) {
+         if (sensitivityRatio && profile.openapsama_useautosens === true) {
              basal = profile.current_basal * sensitivityRatio;
              basal = round_basal(basal, profile);
              if (basal !== profile_current_basal) {
@@ -396,6 +397,8 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
              } else {
                  console.log("Basal unchanged: "+basal+"; ");
              }
+         } else {
+         console.log("Autosens disabled for basal adjustment;");
          }
         /*sens = sens;
         sens = round(sens, 1);
