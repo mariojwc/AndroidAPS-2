@@ -294,7 +294,8 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
     //*********************************************************************************
 
 
-    var sensitivityRatio = ( ( ( tdd_24 * 0.5 ) + (tdd_pump * 0.5) ) / tdd7 );
+    sensitivityRatio = ( ( tdd_24 * 0.5 ) + (tdd_pump * 0.5) ) / tdd7;
+        console.log("Sensitivity ratio: "+sensitivityRatio+"; ");
             if (sensitivityRatio > 1) {
             sensitivityRatio = Math.min(sensitivityRatio, profile.autosens_max);
             sensitivityRatio = round(sensitivityRatio,2);
@@ -306,7 +307,8 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
             console.log("Sensitivity ratio: "+sensitivityRatio+"; ");
                 }
         else {
-        console.log("Sensitivity ratio: "+sensitivityRatio+"; ");}
+        console.log("Sensitivity ratio: "+sensitivityRatio+"; ");
+        }
 
 
     if (sensitivityRatio && profile.openapsama_useautosens === true) {
