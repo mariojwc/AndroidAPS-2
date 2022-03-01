@@ -202,82 +202,6 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
         halfBasalTarget = 160; // when temptarget is 160 mg/dL, run 50% basal (120 = 75%; 140 = 60%)
         // 80 mg/dL with low_temptarget_lowers_sensitivity would give 1.5x basal, but is limited to autosens_max (1.2x by default)
     }
-    if ( high_temptarget_raises_sensitivity && profile.temptargetSet && target_bg > normalTarget
-        || profile.low_temptarget_lowers_sensitivity && profile.temptargetSet && target_bg < normalTarget ) {
-        // w/ target 100, temp target 110 = .89, 120 = 0.8, 140 = 0.67, 160 = .57, and 200 = .44
-        // e.g.: Sensitivity ratio set to 0.8 based on temp target of 120; Adjusting basal from 1.65 to 1.35; ISF from 58.9 to 73.6
-        //sensitivityRatio = 2/(2+(target_bg-normalTarget)/40);
-        var c = halfBasalTarget - normalTarget;
-        sensitivityRatio = c/(c+target_bg-normalTarget);
-        // limit sensitivityRatio to profile.autosens_max (1.2x by default)
-        sensitivityRatio = Math.min(sensitivityRatio, profile.autosens_max);
-        sensitivityRatio = round(sensitivityRatio,2);
-        console.log("Sensitivity ratio set to "+sensitivityRatio+" based on temp target of "+target_bg+"; ");
-    } else if (typeof autosens_data !== 'undefined' && autosens_data) {
-        sensitivityRatio = autosens_data.ratio;
-        console.log("Autosens ratio: "+sensitivityRatio+"; ");
-    }
-    /*if (sensitivityRatio) {
-        basal = profile.current_basal * sensitivityRatio;
-        basal = round_basal(basal, profile);
-        if (basal !== profile_current_basal) {
-            console.log("Adjusting basal from "+profile_current_basal+" to "+basal+"; ");
-        } else {
-            console.log("Basal unchanged: "+basal+"; ");
-        }
-    }*/
-
-    // adjust min, max, and target BG for sensitivity, such that 50% increase in ISF raises target from 100 to 120
-    if (profile.temptargetSet) {
-        //console.log("Temp Target set, not adjusting with autosens; ");
-    } else if (typeof autosens_data !== 'undefined' && autosens_data) {
-        if ( profile.sensitivity_raises_target && autosens_data.ratio < 1 || profile.resistance_lowers_target && autosens_data.ratio > 1 ) {
-            // with a target of 100, default 0.7-1.2 autosens min/max range would allow a 93-117 target range
-            min_bg = round((min_bg - 60) / autosens_data.ratio) + 60;
-            max_bg = round((max_bg - 60) / autosens_data.ratio) + 60;
-            var new_target_bg = round((target_bg - 60) / autosens_data.ratio) + 60;
-            // don't allow target_bg below 80
-            new_target_bg = Math.max(80, new_target_bg);
-            if (target_bg === new_target_bg) {
-                console.log("target_bg unchanged: "+new_target_bg+"; ");
-            } else {
-                console.log("target_bg from "+target_bg+" to "+new_target_bg+"; ");
-            }
-            target_bg = new_target_bg;
-        }
-    }
-
-    if (typeof iob_data === 'undefined' ) {
-        rT.error ='Error: iob_data undefined. ';
-        return rT;
-    }
-
-    var iobArray = iob_data;
-    if (typeof(iob_data.length) && iob_data.length > 1) {
-        iob_data = iobArray[0];
-        //console.error(JSON.stringify(iob_data[0]));
-    }
-
-    if (typeof iob_data.activity === 'undefined' || typeof iob_data.iob === 'undefined' ) {
-        rT.error ='Error: iob_data missing some property. ';
-        return rT;
-    }
-
-    var tick;
-
-    if (glucose_status.delta > -0.5) {
-        tick = "+" + round(glucose_status.delta,0);
-    } else {
-        tick = round(glucose_status.delta,0);
-    }
-    //var minDelta = Math.min(glucose_status.delta, glucose_status.short_avgdelta, glucose_status.long_avgdelta);
-    var minDelta = Math.min(glucose_status.delta, glucose_status.short_avgdelta);
-    var minAvgDelta = Math.min(glucose_status.short_avgdelta, glucose_status.long_avgdelta);
-    var maxDelta = Math.max(glucose_status.delta, glucose_status.short_avgdelta, glucose_status.long_avgdelta);
-
-    var profile_sens = round(profile.sens,1)
-    var sens = profile.sens;
-
     var now = new Date().getHours();
         if (now < 1){
             now = 1;}
@@ -371,36 +295,97 @@ var determine_basal = function determine_basal(glucose_status, currenttemp, iob_
 
 
     if ( high_temptarget_raises_sensitivity && profile.temptargetSet && target_bg > normalTarget || profile.low_temptarget_lowers_sensitivity && profile.temptargetSet && target_bg < normalTarget ) {
+        // w/ target 100, temp target 110 = .89, 120 = 0.8, 140 = 0.67, 160 = .57, and 200 = .44
+        // e.g.: Sensitivity ratio set to 0.8 based on temp target of 120; Adjusting basal from 1.65 to 1.35; ISF from 58.9 to 73.6
+        //sensitivityRatio = 2/(2+(target_bg-normalTarget)/40);
+        var c = halfBasalTarget - normalTarget;
+        sensitivityRatio = c/(c+target_bg-normalTarget);
+        // limit sensitivityRatio to profile.autosens_max (1.2x by default)
+        sensitivityRatio = Math.min(sensitivityRatio, profile.autosens_max);
+        sensitivityRatio = round(sensitivityRatio,2);
+        console.log("Sensitivity ratio set to "+sensitivityRatio+" based on temp target of "+target_bg+"; ");
         sens =  sens / sensitivityRatio ;
         sens = round(sens, 1);
         console.log("ISF from "+variable_sens+" to "+sens+ "due to temp target; ");
+        }
+        else {
+        sensitivityRatio = ( ( ( tdd_24 * 0.5 ) + (tdd_pump * 0.5) ) / tdd7 );
+            if (sensitivityRatio > 1) {
+            sensitivityRatio = Math.min(sensitivityRatio, profile.autosens_max);
+            sensitivityRatio = round(sensitivityRatio,2);
+            console.log("Sensitivity ratio: "+sensitivityRatio+"; ");
+        }
+            else if( sensitivityRatio < 1) {
+            sensitivityRatio = Math.max(sensitivityRatio, profile.autosens_min);
+            sensitivityRatio = round(sensitivityRatio,2);
+            console.log("Sensitivity ratio: "+sensitivityRatio+"; ");
+                }
+        }
+
+
+    if (sensitivityRatio) {
+        basal = profile.current_basal * sensitivityRatio;
+        basal = round_basal(basal, profile);
+        if (basal !== profile_current_basal) {
+            console.log("Adjusting basal from "+profile_current_basal+" to "+basal+"; ");
+        } else {
+            console.log("Basal unchanged: "+basal+"; ");
+        }
+    }
+
+    // adjust min, max, and target BG for sensitivity, such that 50% increase in ISF raises target from 100 to 120
+    if (profile.temptargetSet) {
+        //console.log("Temp Target set, not adjusting with autosens; ");
     } else {
-             sensitivityRatio = ( ((tdd_24 * 0.5) + (tdd_pump * 0.5)) / tdd7 );}
+        if ( profile.sensitivity_raises_target && sensitivityRatio < 1 || profile.resistance_lowers_target && sensitivityRatio > 1 ) {
+            // with a target of 100, default 0.7-1.2 autosens min/max range would allow a 93-117 target range
+            min_bg = round((min_bg - 60) / sensitivityRatio) + 60;
+            max_bg = round((max_bg - 60) / sensitivityRatio) + 60;
+            var new_target_bg = round((target_bg - 60) / sensitivityRatio) + 60;
+            // don't allow target_bg below 80
+            new_target_bg = Math.max(80, new_target_bg);
+            if (target_bg === new_target_bg) {
+                console.log("target_bg unchanged: "+new_target_bg+"; ");
+            } else {
+                console.log("target_bg from "+target_bg+" to "+new_target_bg+"; ");
+            }
+            target_bg = new_target_bg;
+        }
+    }
 
-    if (sensitivityRatio > 1) {
-             sensitivityRatio = Math.min(sensitivityRatio, profile.autosens_max);
-             sensitivityRatio = round(sensitivityRatio,2);
-             console.log("Sensitivity ratio: "+sensitivityRatio+"; ");
-             }
-    else if( sensitivityRatio < 1) {
-             sensitivityRatio = Math.max(sensitivityRatio, profile.autosens_min);
-             sensitivityRatio = round(sensitivityRatio,2);
-             console.log("Sensitivity ratio: "+sensitivityRatio+"; ");
-             }
 
+    if (typeof iob_data === 'undefined' ) {
+        rT.error ='Error: iob_data undefined. ';
+        return rT;
+    }
 
-         if (sensitivityRatio && profile.openapsama_useautosens === true) {
-             basal = profile.current_basal * sensitivityRatio;
-             basal = round_basal(basal, profile);
-             if (basal !== profile_current_basal) {
-                 console.log("Adjusting basal from "+profile_current_basal+" to "+basal+"; ");
-             } else {
-                 console.log("Basal unchanged: "+basal+"; ");
-             }
-         } else {
-         console.log("Autosens disabled for basal adjustment;");
-         }
-        /*sens = sens;
+    var iobArray = iob_data;
+    if (typeof(iob_data.length) && iob_data.length > 1) {
+        iob_data = iobArray[0];
+        //console.error(JSON.stringify(iob_data[0]));
+    }
+
+    if (typeof iob_data.activity === 'undefined' || typeof iob_data.iob === 'undefined' ) {
+        rT.error ='Error: iob_data missing some property. ';
+        return rT;
+    }
+
+    var tick;
+
+    if (glucose_status.delta > -0.5) {
+        tick = "+" + round(glucose_status.delta,0);
+    } else {
+        tick = round(glucose_status.delta,0);
+    }
+    //var minDelta = Math.min(glucose_status.delta, glucose_status.short_avgdelta, glucose_status.long_avgdelta);
+    var minDelta = Math.min(glucose_status.delta, glucose_status.short_avgdelta);
+    var minAvgDelta = Math.min(glucose_status.short_avgdelta, glucose_status.long_avgdelta);
+    var maxDelta = Math.max(glucose_status.delta, glucose_status.short_avgdelta, glucose_status.long_avgdelta);
+
+    //var profile_sens = round(profile.sens,1)
+    //var sens = profile.sens;
+    /*if (typeof autosens_data !== 'undefined' && autosens_data) {
+        sens = profile.sens / sensitivityRatio;
         sens = round(sens, 1);
     }*/
 
