@@ -123,7 +123,7 @@ android {
         full {
             applicationId "info.nightscout.androidaps"
             dimension "standard"
-            resValue "string", "app_name", "AndroidAPS"
+            resValue "string", "app_name", "AndroidAPS-DynamicISF-Test"
             versionName version
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher",
