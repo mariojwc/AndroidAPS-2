@@ -229,7 +229,7 @@ class DetermineBasalAdapterSMBJS internal constructor(private val scriptReader: 
         this.profile.put("enableSMB_always", smbEnabled && sp.getBoolean(R.string.key_enableSMB_always, false) && advancedFiltering)
         this.profile.put("enableSMB_after_carbs", smbEnabled && sp.getBoolean(R.string.key_enableSMB_after_carbs, false) && advancedFiltering)
         this.profile.put("maxSMBBasalMinutes", sp.getInt(R.string.key_smbmaxminutes, SMBDefaults.maxSMBBasalMinutes))
-        this.profile.put("dynisfadjust", sp.getInt(R.string.key_dynisfadjust, SMBDefaults.dynisfAdjust))
+        this.profile.put("DynISFAdjust",  SafeParse.stringToDouble(sp.getString(R.string.key_DynISFAdjust,"100")))
         this.profile.put("maxUAMSMBBasalMinutes", sp.getInt(R.string.key_uamsmbmaxminutes, SMBDefaults.maxUAMSMBBasalMinutes))
         //set the min SMB amount to be the amount set by the pump.
         this.profile.put("bolus_increment", pumpBolusStep)
@@ -237,6 +237,8 @@ class DetermineBasalAdapterSMBJS internal constructor(private val scriptReader: 
         this.profile.put("current_basal", basalRate)
         this.profile.put("temptargetSet", tempTargetSet)
         this.profile.put("autosens_max", SafeParse.stringToDouble(sp.getString(R.string.key_openapsama_autosens_max, "1.2")))
+        this.profile.put("autosens_min", SafeParse.stringToDouble(sp.getString(R.string.key_openapsama_autosens_min, "0.8")))
+        this.profile.put("openapsama_useautosens", sp.getBoolean(R.string.key_openapsama_useautosens, false))
         if (profileFunction.getUnits() == GlucoseUnit.MMOL) {
             this.profile.put("out_units", "mmol/L")
         }
@@ -271,6 +273,7 @@ class DetermineBasalAdapterSMBJS internal constructor(private val scriptReader: 
         tddAIMI = TddCalculator(aapsLogger,rh,activePlugin,profileFunction,dateUtil,iobCobCalculator, repository)
         this.mealData.put("TDDAIMI7", tddAIMI!!.averageTDD(tddAIMI!!.calculate(7)).totalAmount)
         this.mealData.put("TDDPUMP", tddAIMI!!.calculateDaily().totalAmount)
+        this.mealData.put("TDDLast24", tddAIMI!!.calculate24Daily().totalAmount)
 
         if (constraintChecker.isAutosensModeEnabled().value()) {
             autosensData.put("ratio", autosensDataRatio)
